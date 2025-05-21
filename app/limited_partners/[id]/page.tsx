@@ -9,7 +9,11 @@ const tabs = [
   { label: "Reports", url: "/reports" },
 ];
 
-export default function LimitedPartnerPage({ params }: { params: { id: string } }) {
+interface LimitedPartnerPageProps {
+  params: { id: string };
+} 
+
+export default function LimitedPartnerPage({ params }: LimitedPartnerPageProps) {
   const [healthMessage, setHealthMessage] = useState<string>('');
 
   const checkHealth = async () => {
