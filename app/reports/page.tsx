@@ -1,5 +1,7 @@
 'use client';
 
+import Button from '../components/Button';
+
 interface ReportsProps {
     name: string;
     description: string;
@@ -8,23 +10,21 @@ interface ReportsProps {
 }
 
 const Reports = ({ name, description, downloadUrl, children }: ReportsProps) => {
-    return (
-        <div className="rounded-lg bg-slate-800 p-4 flex flex-col justify-between h-[450px]">
-            <div>
-              <h1 className="text-2xl font-bold mb-4">{name}</h1>
-              <p className="text-sm text-gray-500 mb-4">{description}</p>
-              {children}
-            </div>
-            <div className="flex justify-center">
-              <button 
-                className="bg-shamrock-400 text-white px-4 py-2 rounded-md hover:bg-shamrock-600 cursor-pointer"
-                onClick={() => window.open(downloadUrl, '_blank')}
-              >
-                Download
-              </button>
-            </div>
+  return (
+    <div className="rounded-lg bg-slate-800 p-4 flex flex-col justify-between h-[450px]">
+        <div>
+          <h1 className="text-2xl font-bold mb-4">{name}</h1>
+          <p className="text-sm text-gray-500 mb-4">{description}</p>
+          {children}
         </div>
-    )
+        <div className="flex justify-center">
+          <Button 
+            onClick={() => window.open(downloadUrl, '_blank')}
+            label="Download"
+          />
+        </div>
+    </div>
+  )
 }
 
 const reports = [

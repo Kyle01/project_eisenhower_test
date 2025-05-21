@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <TabBar tabs={tabs} />
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
-          {children}
+        {children}
         </div>
       </body>
     </html>
