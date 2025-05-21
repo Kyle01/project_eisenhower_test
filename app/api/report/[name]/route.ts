@@ -1,12 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { name: string } }
+  request: NextRequest,
 ) {
-  const { name } = params;
+  const name = request.nextUrl.pathname.match(/[^\/]+$/)?.[0];
   try {
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
