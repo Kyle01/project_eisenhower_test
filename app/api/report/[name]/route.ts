@@ -10,12 +10,11 @@ export async function GET(
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
-    // Ensure we're using the correct path to the public directory
+
     const publicDir = path.join(process.cwd(), 'public');
     const reportsDir = path.join(publicDir, 'reports');
     const filePath = path.join(reportsDir, name);
 
-    // Check if file exists
     try {
       await fs.access(filePath);
     } catch {

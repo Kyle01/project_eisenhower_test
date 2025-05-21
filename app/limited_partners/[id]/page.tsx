@@ -40,7 +40,7 @@ export default function LimitedPartnerPage() {
           <div className="flex items-center gap-4">
             <p className="text-lg font-bold">Selected a Limited Partner:</p>
             <select value={selectedLp} onChange={handleLpChange} className="w-full p-2 max-w-[400px] border border-gray-300 rounded-md text-lg">
-              {availableLps.map((lp) => (
+              {availableLps?.map((lp) => (
                 <option key={lp.id} value={lp.id}>{lp.name}</option>
               ))}
             </select>
