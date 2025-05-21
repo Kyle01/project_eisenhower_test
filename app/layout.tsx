@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 const tabs = [
-  { label: "Limited Partners", url: "/limited_partners/1" },
+  { label: "Limited Partners", url: "/limited_partners/0" },
   { label: "Reports", url: "/reports" },
 ];
 

@@ -3,20 +3,15 @@
 import { useState } from 'react';
 import TabBar from '../../components/TabBar';
 import Button from '../../components/Button';
+import { useParams } from 'next/navigation'
 
 const tabs = [
   { label: "Limited Partners", url: "/limited_partners/1" },
   { label: "Reports", url: "/reports" },
 ];
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export default function LimitedPartnerPage({ params }: PageProps) {
+export default function LimitedPartnerPage() {
+  const params = useParams<{id: string}>();
   const [healthMessage, setHealthMessage] = useState<string>('');
 
   const checkHealth = async () => {
@@ -29,9 +24,9 @@ export default function LimitedPartnerPage({ params }: PageProps) {
     }
   };
 
+
   return (
     <div>
-      <TabBar tabs={tabs} />
       <div className="p-8">
         <h1 className="text-2xl font-bold mb-4">Limited Partner Details</h1>
         <p className="mb-4">Partner ID: {params.id}</p>
