@@ -1,14 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import TabBar from '../../components/TabBar';
 import Button from '../../components/Button';
 import { useParams } from 'next/navigation'
-
-const tabs = [
-  { label: "Limited Partners", url: "/limited_partners/1" },
-  { label: "Reports", url: "/reports" },
-];
 
 export default function LimitedPartnerPage() {
   const params = useParams<{id: string}>();
