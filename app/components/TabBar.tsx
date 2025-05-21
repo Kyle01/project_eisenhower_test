@@ -15,7 +15,8 @@ function Tab({ label, url }: TabItem) {
   const router = useRouter();
   const pathname = usePathname();
   
-  const isActive = pathname === url || pathname.startsWith(url + '/');
+  const testUrl = url?.match(/^\/[^\/]+/)?.[0] ?? null;
+  const isActive = pathname === testUrl || pathname.startsWith(testUrl + '/');
 
   return (
     <button
@@ -23,7 +24,7 @@ function Tab({ label, url }: TabItem) {
       className={`${
         isActive
           ? 'border-shamrock-400 text-shamrock-400 cursor-pointer'
-          : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300 cursor-pointer'
+          : 'border-transparent text-gray-500 hover:text-gray-00 hover:border-gray-300 cursor-pointer'
       } whitespace-nowrap py-4 px-1 border-b-2 font-medium`}
     >
       {label}
