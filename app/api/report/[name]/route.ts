@@ -3,10 +3,9 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { name: string } }
 ) {
-  console.log(params);
   const { name } = params;
   try {
     if (!name) {

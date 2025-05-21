@@ -6,7 +6,7 @@ import TabBar from "./components/TabBar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PE Boiler Test",
+  title: "Project Eisenhower",
   description: "Private Equity Boiler Test",
 };
 

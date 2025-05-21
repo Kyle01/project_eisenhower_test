@@ -1,49 +1,22 @@
 import { NextResponse } from 'next/server';
+import * as XLSX from 'xlsx';
 
-// Mock data - replace with actual data source in production
-const limitedPartners = [
-  {
-    id: 1,
-    name: "ABC Capital",
-    type: "Pension Fund",
-    country: "United States",
-    totalCommitment: 50000000,
-    activeFunds: 3
-  },
-  {
-    id: 2,
-    name: "XYZ Investments",
-    type: "Endowment",
-    country: "United Kingdom",
-    totalCommitment: 75000000,
-    activeFunds: 4
-  },
-  {
-    id: 3,
-    name: "Global Ventures",
-    type: "Sovereign Wealth Fund",
-    country: "Singapore",
-    totalCommitment: 100000000,
-    activeFunds: 5
-  },
-  {
-    id: 4,
-    name: "Pacific Partners",
-    type: "Insurance Company",
-    country: "Japan",
-    totalCommitment: 25000000,
-    activeFunds: 2
-  },
-  {
-    id: 5,
-    name: "European Capital",
-    type: "Family Office",
-    country: "Germany",
-    totalCommitment: 15000000,
-    activeFunds: 1
-  }
-];
-
-export async function GET() {
-  return NextResponse.json(limitedPartners);
+export async function GET(request: Request) {
+    try {
+        // Get the origin from the request
+        const origin = request.headers.get('origin') || 'http://localhost:3000';
+        // Use the full URL
+        const response = await fetch(`${origin}/reports/tbLPLookup.csv`);
+        if (!response.ok) {
+            return NextResponse.json({ error: 'File not found' }, { status: 404 });
+        }
+        
+        const buffer = await response.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+        return NextResponse.json(data);
+    } catch (error) {
+        console.error('Error reading file:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 } 
