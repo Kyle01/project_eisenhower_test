@@ -14,7 +14,11 @@ export async function GET(request: Request) {
         const buffer = await response.arrayBuffer();
         const workbook = XLSX.read(buffer, { type: 'array' });
         const data = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-        return NextResponse.json(data);
+        const applicableData = data.map((d: any) => ({
+            id: d['SEI_ID_ABF'],
+            name: d['LP Short Name'],
+        }))
+        return NextResponse.json(applicableData);
     } catch (error) {
         console.error('Error reading file:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

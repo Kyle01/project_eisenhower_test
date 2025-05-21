@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push('/limited_partners/0');
+    router.push('/limited_partners/10305');
   }, [router]);
 
   return (
