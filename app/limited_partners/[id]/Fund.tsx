@@ -60,15 +60,15 @@ export default function Fund({ fund, index }: FundProps) {
                                 <tbody>
                                     <tr className="bg-gray-900 hover:bg-gray-800">
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">First Close</td>
-                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{fund.firstClose ? new Date(fund.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'}) : '-'}</td>
+                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{fund.firstClose ? new Date(fund.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) : '-'}</td>
                                     </tr>
                                     <tr className="bg-gray-950 hover:bg-gray-800">
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">Reinvestment Start</td>
-                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{fund.reinvestmentStart ? new Date(fund.reinvestmentStart).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'}) : '-'}</td>
+                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{fund.reinvestmentStart ? new Date(fund.reinvestmentStart).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) : '-'}</td>
                                     </tr>
                                     <tr className="bg-gray-900 hover:bg-gray-800">
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">Harvest Start</td>
-                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{fund.harvestStart ? new Date(fund.harvestStart).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'}) : '-'}</td>
+                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{fund.harvestStart ? new Date(fund.harvestStart).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) : '-'}</td>
                                     </tr>
                                     <tr className="bg-gray-950 hover:bg-gray-800">
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">Management Fee</td>

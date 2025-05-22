@@ -70,17 +70,23 @@ export async function GET(
     const pivotCashFlowData = pivotCashflowData(applicableCashflowData)
     
     let irr = 'NA'
-    if (mappedLpLedgerData.some((d) => d.activity.includes('Capital Call')) && mappedLpLedgerData.some((d) => d.activity.includes('Distribution')) && mappedLpLedgerData.length >= 2) {
-      const mappedLedgerCfData = mappedLpLedgerData.map((d) => {
-        const appliedAmount = d.activity.includes('Capital Call') ? d.amount * -1 : d.amount
-        return ({when: new Date(d.activityDate), amount: appliedAmount})
-      })
-      try {
-        irr = xirr(mappedLedgerCfData, { guess: -100 })
-      } catch (error) {
-        console.error('Error calculating IRR:', error);
-        irr = 'NA';
-      }
+  
+    const mappedLedgerCfData = mappedLpLedgerData.filter((d) => d.activity !== 'LP Commitment').map((d) => {
+      const appliedAmount = d.activity.includes('Capital Call') ? d.amount * -1 : d.amount
+      return ({when: new Date(d.activityDate), amount: appliedAmount})
+    })
+    const lastBalance = pivotCashFlowData.at(-1)
+    console.log(lastBalance)
+    const cashflowDataWithLastBalance = [
+      ...mappedLedgerCfData,
+      {when: new Date(lastBalance['key']), amount: lastBalance['Ending Capital Balance']}
+    ]
+    console.log(cashflowDataWithLastBalance)
+    try {
+      irr = xirr(cashflowDataWithLastBalance, { guess: 0.25 })
+    } catch (error) {
+      console.error('Error calculating IRR:', error);
+      irr = 'NA';
     }
     
 
@@ -112,7 +118,7 @@ export async function GET(
           commitmentAmountTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'LP Commitment').reduce((acc, curr) => acc + curr.amount, 0),
           capitalCalledTotal: totalCapitalCalled,
           capitalDistributedTotal: totalCapitalDistributed,
-          incomeDistributedTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0),
+          incomeDistributedTotal: mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0),
           remainingCapitalTotal: totalCapitalCalled - totalCapitalDistributed,
           ledger: mappedLedgerData
       })});

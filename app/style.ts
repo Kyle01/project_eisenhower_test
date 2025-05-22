@@ -4,7 +4,7 @@ export const sharedColumnDefs = {
     date: {
         filter: true,
         valueFormatter: (params: any) => {
-            return params.value ? new Date(params.value).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'}) : '-';
+            return params.value ? new Date(params.value).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) : '-';
         },
         cellClass: 'text-right',
         headerClass: 'text-right',

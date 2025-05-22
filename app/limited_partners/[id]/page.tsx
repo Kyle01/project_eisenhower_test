@@ -78,8 +78,8 @@ export default function LimitedPartnerPage() {
         <div className='grid grid-cols-6 gap-4'>
           <DisplayCard label="Status" value={selectedLpDetails?.status} />
           <DisplayCard label="Source" value={selectedLpDetails?.source} />
-          <DisplayCard label="First Close" value={selectedLpDetails?.firstClose && new Date(selectedLpDetails?.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'}) || 'N/A'  } />
-          <DisplayCard label="Inactive Date" value={selectedLpDetails?.inactiveDate && new Date(selectedLpDetails?.inactiveDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) || 'N/A'} />
+          <DisplayCard label="First Close" value={selectedLpDetails?.firstClose && new Date(selectedLpDetails?.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) || 'N/A'  } />
+          <DisplayCard label="Inactive Date" value={selectedLpDetails?.inactiveDate && new Date(selectedLpDetails?.inactiveDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'}) || 'N/A'} />
           <DisplayCard label="Reinvestment Enabled" value={selectedLpDetails?.reinvestmentEnabled ? 'Yes' : 'No'} />
           <DisplayCard label="IRR" value={selectedLpDetails?.irr && selectedLpDetails?.irr !== 'NA' ? formatNumberToPercentage(Number(selectedLpDetails?.irr)) : 'N/A'} />
         </div>
