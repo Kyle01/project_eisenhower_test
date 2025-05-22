@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
 import DatePicker from 'react-datepicker';
+import { LimitedPartnerDetail } from '@/app/type';
 import "react-datepicker/dist/react-datepicker.css";
 
 interface LimitedPartner {
@@ -19,7 +20,7 @@ export default function LimitedPartnerPage() {
   const [availableLps, setAvailableLps] = useState<LimitedPartner[]>([]);
   const [selectedLp, setSelectedLp] = useState<string>(params.id || '10305');
   const [selectedReportDate, setSelectedReportDate] = useState<Date>(new Date());
-  const [selectedLpDetails, setSelectedLpDetails] = useState<JsonObject | null>(null);
+  const [selectedLpDetails, setSelectedLpDetails] = useState<LimitedPartnerDetail | null>(null);
 
   useEffect(() => {
     fetch('/api/limited_partners/all')
@@ -31,7 +32,6 @@ export default function LimitedPartnerPage() {
 
   useEffect(() => {
     setSelectedLp(params.id);
-    const applicableLp = availableLps.find(lp => lp.id === selectedLp);
     fetch(`/api/limited_partners/${params.id}?reportDate=${selectedReportDate.toISOString()}`)
       .then(res => res.json())
       .then(data => {

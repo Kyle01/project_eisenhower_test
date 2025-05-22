@@ -1,5 +1,3 @@
-
-
 export type LimitedPartnerDetail = {
     id: string;
     name: string;
@@ -9,6 +7,8 @@ export type LimitedPartnerDetail = {
     inactiveDate?: Date;
     reinvestmentEnabled: boolean;
     funds: LimitedPartnerFundDetail[];
+    cashFlows: Cashflow[]
+    irr: number | string;
 }
 
 export type LimitedPartnerFundDetail = {
@@ -23,14 +23,13 @@ export type LimitedPartnerFundDetail = {
     capitalDistributedTotal: number;
     incomeDistributedTotal: number;
     remainingCapitalTotal: number;
-    irr: number;
-    cashFlows: Cashflow[]
     ledger: LedgerDetail[]
 }
 
 export type Cashflow = {
     date: Date;
-    cashflow: number;
+    amount: number;
+    description: string;
 }
 
 export type LedgerDetail = {

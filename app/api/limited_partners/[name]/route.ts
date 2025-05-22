@@ -3,7 +3,8 @@ import * as XLSX from 'xlsx';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { excelDateToJSDate } from '@/app/utils';
-import { LedgerDetail } from '@/app/type';
+import { LedgerDetail, Cashflow } from '@/app/type';
+const xirr = require('xirr');
 
 type JsonObject = { [key: string]: any };
 
@@ -34,43 +35,66 @@ export async function GET(
     const ledgerBuffer = await fs.readFile(ledgerFilePath);
     const ledgerWorkbook = XLSX.read(ledgerBuffer, { type: 'array' });
     const ledgerData: JsonObject = XLSX.utils.sheet_to_json(ledgerWorkbook.Sheets[ledgerWorkbook.SheetNames[0]]);
-    
+
+    const cashFlowFilePath = path.join(process.cwd(), 'public', 'reports', 'tbPCAP.csv');
+    const cashFlowBuffer = await fs.readFile(cashFlowFilePath);
+    const cashFlowWorkbook = XLSX.read(cashFlowBuffer, { type: 'array' });
+    const cashFlowData: JsonObject = XLSX.utils.sheet_to_json(cashFlowWorkbook.Sheets[cashFlowWorkbook.SheetNames[0]]);
+    const applicableCashflowData: JsonObject[] = cashFlowData.filter((d: any) => d['LP Short Name'] === applicableName && excelDateToJSDate(Number(d['PCAP Date'])) <= reportDate);
+    const mappedApplicableCashflowData: Cashflow[] = applicableCashflowData.map((d: any) => ({
+        date: excelDateToJSDate(Number(d['PCAP Date'])),
+        description: d['Field'],
+        amount: d[' Amount '],
+    }));
+    const cashflowDataForIrr = mappedApplicableCashflowData.filter((d) => d.description.includes('Distributions') || d.description === 'Capital Calls')
+    const combinedCashflowDataForIrr = Array.from(
+        cashflowDataForIrr.reduce((map, { amount, date }) => {
+            const key = date.toISOString().split('T')[0]
+            if (!map.has(key)) {
+            map.set(key, { date, amount: 0 });
+            }
+            map.get(key).amount += amount * -1;
+            return map;
+        }, new Map()).values()
+    );
+    let irr = 'NA'
+    if (combinedCashflowDataForIrr.some((d) => d.amount > 0) && combinedCashflowDataForIrr.some((d) => d.amount < 0) && combinedCashflowDataForIrr.length >= 2) {
+      irr = xirr(combinedCashflowDataForIrr.map((d) => ({ when: new Date(d.date), amount: (d.amount )})), { guess: 0.75 });
+    }
     
     const lpFunds: JsonObject[] = applicableLpPostions.map((d: any) => {
-        const applicableLedgerData: JsonObject[] = ledgerData.filter((ledgerField: any) => ledgerField['Related Entity'] === applicableName && ledgerField['Related Fund'] === d['Fund'] && excelDateToJSDate(ledgerField['Effective Date']) <= reportDate);
-        const mappedLedgerData: LedgerDetail[] = applicableLedgerData.map((ledgerField: any) => ({
-            entryDate: excelDateToJSDate(Number(ledgerField['Entry Date'])),
-            activityDate: excelDateToJSDate(Number(ledgerField['Activity Date'])),
-            effectiveDate: excelDateToJSDate(Number(ledgerField['Effective Date'])),
-            activity: ledgerField['Activity'],
-            subActivity: ledgerField['Sub Activity'],
-            amount: ledgerField['Amount'],
-            entityFrom: ledgerField['Entity From'],
-            entityTo: ledgerField['Entity To'],
-            relatedEntity: ledgerField['Related Entity'],
-            relatedFund: ledgerField['Related Fund']
-        }));
-        
-        const totalCapitalCalled = mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Capital Call').reduce((acc, curr) => acc + curr.amount, 0)
-        const totalCapitalDistributed =  mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Capital Distribution').reduce((acc, curr) => acc + curr.amount, 0)
-        return ({
-            firstClose: excelDateToJSDate(Number(d['Term End'])),
-            reinvestmentStart: d['Reinvest Start'] !== 'NA' ? excelDateToJSDate(Number(d['Reinvest Start'])) : null,
-            harvestStart: d['Harvest Start'] ? excelDateToJSDate(Number(d['Term End'])) : null,
-            managementFee: d['Management Fee'],
-            incentiveFee: d['Incentive'],
-            reportedDate: reportDate,
-            commitmentAmountTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'LP Commitment').reduce((acc, curr) => acc + curr.amount, 0),
-            capitalCalledTotal: totalCapitalCalled,
-            capitalDistributedTotal: totalCapitalDistributed,
-            incomeDistributedTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0),
-            remainingCapitalTotal: totalCapitalCalled - totalCapitalDistributed,
-            irr: 1,
-            cashFlows: [],
-            ledger: mappedLedgerData
-    })});
-
-    return new NextResponse(JSON.stringify({
+    const applicableLedgerData: JsonObject[] = ledgerData.filter((ledgerField: any) => ledgerField['Related Entity'] === applicableName && ledgerField['Related Fund'] === d['Fund'] && excelDateToJSDate(ledgerField['Effective Date']) <= reportDate);
+    const mappedLedgerData: LedgerDetail[] = applicableLedgerData.map((ledgerField: any) => ({
+        entryDate: excelDateToJSDate(Number(ledgerField['Entry Date'])),
+        activityDate: excelDateToJSDate(Number(ledgerField['Activity Date'])),
+        effectiveDate: excelDateToJSDate(Number(ledgerField['Effective Date'])),
+        activity: ledgerField['Activity'],
+        subActivity: ledgerField['Sub Activity'],
+        amount: ledgerField['Amount'],
+        entityFrom: ledgerField['Entity From'],
+        entityTo: ledgerField['Entity To'],
+        relatedEntity: ledgerField['Related Entity'],
+        relatedFund: ledgerField['Related Fund']
+    }));
+    
+    const totalCapitalCalled = mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Capital Call').reduce((acc, curr) => acc + curr.amount, 0)
+    const totalCapitalDistributed =  mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Capital Distribution').reduce((acc, curr) => acc + curr.amount, 0)
+    return ({
+        firstClose: excelDateToJSDate(Number(d['Term End'])),
+        reinvestmentStart: d['Reinvest Start'] !== 'NA' ? excelDateToJSDate(Number(d['Reinvest Start'])) : null,
+        harvestStart: d['Harvest Start'] ? excelDateToJSDate(Number(d['Term End'])) : null,
+        managementFee: d['Management Fee'],
+        incentiveFee: d['Incentive'],
+        reportedDate: reportDate,
+        commitmentAmountTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'LP Commitment').reduce((acc, curr) => acc + curr.amount, 0),
+        capitalCalledTotal: totalCapitalCalled,
+        capitalDistributedTotal: totalCapitalDistributed,
+        incomeDistributedTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0),
+        remainingCapitalTotal: totalCapitalCalled - totalCapitalDistributed,
+        ledger: mappedLedgerData
+      })});
+      
+      return new NextResponse(JSON.stringify({
         id: lpId,
         name: applicableLp?.['LP Short Name'],
         status: applicableLp?.['Status'],
@@ -78,7 +102,9 @@ export async function GET(
         firstClose: excelDateToJSDate(Number(applicableLp?.['Effective Date'])),
         inactiveDate: applicableLp?.['Inactive Date'] ? new Date(applicableLp?.['Inactive Date']) : null,
         reinvestmentEnabled: false,
-        funds: lpFunds
+        funds: lpFunds,
+        cashFlows: mappedApplicableCashflowData,
+        irr: irr,
     }));
   } catch (error) {
     console.error('Error serving file:', error);
