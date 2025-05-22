@@ -9,6 +9,7 @@ import DisplayCard from '@/app/components/DisplayCard';
 import { formatNumberToPercentage } from '@/app/utils';
 import "react-datepicker/dist/react-datepicker.css";
 import Fund from './Fund';
+import CashflowTable from './CashflowTable';
 
 interface LimitedPartner {
   id: string;
@@ -50,10 +51,12 @@ export default function LimitedPartnerPage() {
     setSelectedLp(newId);
   };
 
+  const name = selectedLpDetails?.name;
+
   return (
     <div className="my-8">
       <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4 max-w-[500px]">
+        <div className="grid grid-cols-2 gap-4 max-w-[500px] items-center">
           <p className="text-lg font-bold">Selected a Limited Partner:</p>
           <select value={selectedLp} onChange={handleLpChange} className="w-full p-2 max-w-[400px] border border-gray-300 rounded-md text-lg">
             {availableLps?.map((lp) => (
@@ -61,7 +64,7 @@ export default function LimitedPartnerPage() {
             ))}
           </select>
         </div>
-          <div className="grid grid-cols-2 gap-4 max-w-[500px]">
+          <div className="grid grid-cols-2 gap-4 max-w-[500px] items-center">
             <p className="text-lg font-bold">Applied Report Date:</p>
             <DatePicker
               selected={selectedReportDate}
@@ -81,9 +84,10 @@ export default function LimitedPartnerPage() {
           <DisplayCard label="IRR" value={selectedLpDetails?.irr && selectedLpDetails?.irr !== 'NA' ? formatNumberToPercentage(Number(selectedLpDetails?.irr)) : 'N/A'} />
         </div>
         <p className="text-lg font-bold underline">Client Participating Funds: {selectedLpDetails?.funds.length}</p>
-        <div className="">
+        <div>
           {selectedLpDetails?.funds.map((fund, index) => <Fund fund={fund} key={index} index={index} />)}
         </div>
+        <CashflowTable cashFlows={selectedLpDetails?.cashFlows || []} name={name ?? ''} />
       </div>
     </div>
   );

@@ -18,5 +18,14 @@ export const sharedColumnDefs = {
         cellClass: 'text-right',
         headerClass: 'text-right',
         width: 125,
+    },
+    moneyNoDecimals: {
+        filter: true,
+        valueFormatter: (params: any) => {
+            return params.value ? formatNumberToCurrency(params.value, 0) : '-';
+        },
+        cellClass: 'text-right',
+        headerClass: 'text-right',
+        width: 125,
     }
 }

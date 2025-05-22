@@ -75,7 +75,6 @@ export async function GET(
         const appliedAmount = d.activity.includes('Capital Call') ? d.amount * -1 : d.amount
         return ({when: new Date(d.activityDate), amount: appliedAmount})
       })
-      console.log(mappedLedgerCfData)
       try {
         irr = xirr(mappedLedgerCfData, { guess: -100 })
       } catch (error) {

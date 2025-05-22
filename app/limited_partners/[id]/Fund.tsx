@@ -4,13 +4,8 @@ import { LimitedPartnerFundDetail } from "@/app/type";
 import { sharedColumnDefs } from "@/app/style";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faDownload, faFileExcel } from "@fortawesome/free-solid-svg-icons";
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry, ColDef, AllCommunityModule } from 'ag-grid-community';
-import { themeBalham, colorSchemeDarkBlue } from 'ag-grid-community';
-
-const themeBalhamDark = themeBalham.withPart(colorSchemeDarkBlue);
-      
-ModuleRegistry.registerModules([ AllCommunityModule ])
+import OpinionatedTable from "../../components/OpinionatedTable";
+import { ColDef } from "ag-grid-community";
 
 interface FundProps {
     fund: LimitedPartnerFundDetail;
@@ -53,7 +48,7 @@ export default function Fund({ fund, index }: FundProps) {
                         isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
                     } overflow-hidden`}
                 >
-                    <div className="p-4">
+                    <div className="pt-4 px-4">
                         <div className="overflow-x-auto">
                             <table className="min-w-full border-collapse">
                                 <thead>
@@ -87,7 +82,7 @@ export default function Fund({ fund, index }: FundProps) {
                             </table>
                         </div>
                     </div>
-                    <div className="p-4">
+                    <div className="pt-4 px-4">
                         <div className="overflow-x-auto">
                             <table className="min-w-full border-collapse">
                                 <thead>
@@ -138,11 +133,10 @@ export default function Fund({ fund, index }: FundProps) {
                             </button>
                         </div>
                         <div className="p-4 h-[300px]">
-                            <AgGridReact
+                            <OpinionatedTable
                                 ref={gridRef}
                                 columnDefs={columnDefs}
                                 rowData={fund.ledger}
-                                theme={themeBalhamDark}
                             />
                         </div>
                     </div>

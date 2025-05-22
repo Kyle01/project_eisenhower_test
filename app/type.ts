@@ -1,4 +1,4 @@
-type JsonObject = { [key: string]: any };
+export type JsonObject = { [key: string]: any };
 
 export type LimitedPartnerDetail = {
     id: string;
