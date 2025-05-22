@@ -100,27 +100,28 @@ export async function GET(
         relatedFund: ledgerField['Related Fund']
     }));
     
-    const totalCapitalCalled = mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Capital Call').reduce((acc, curr) => acc + curr.amount, 0)
-    const totalCapitalDistributed =  mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Capital Distribution').reduce((acc, curr) => acc + curr.amount, 0)
-    return ({
-        firstClose: excelDateToJSDate(Number(d['Term End'])),
-        reinvestmentStart: d['Reinvest Start'] !== 'NA' ? excelDateToJSDate(Number(d['Reinvest Start'])) : null,
-        harvestStart: d['Harvest Start'] ? excelDateToJSDate(Number(d['Term End'])) : null,
-        managementFee: d['Management Fee'],
-        incentiveFee: d['Incentive'],
-        reportedDate: reportDate,
-        commitmentAmountTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'LP Commitment').reduce((acc, curr) => acc + curr.amount, 0),
-        capitalCalledTotal: totalCapitalCalled,
-        capitalDistributedTotal: totalCapitalDistributed,
-        incomeDistributedTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0),
-        remainingCapitalTotal: totalCapitalCalled - totalCapitalDistributed,
-        ledger: mappedLedgerData
+      const totalCapitalCalled = mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Capital Call').reduce((acc, curr) => acc + curr.amount, 0)
+      const totalCapitalDistributed =  mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Capital Distribution').reduce((acc, curr) => acc + curr.amount, 0)
+      return ({
+          name: d['Fund'],
+          firstClose: excelDateToJSDate(Number(d['Term End'])),
+          reinvestmentStart: d['Reinvest Start'] !== 'NA' ? excelDateToJSDate(Number(d['Reinvest Start'])) : null,
+          harvestStart: d['Harvest Start'] ? excelDateToJSDate(Number(d['Term End'])) : null,
+          managementFee: d['Management Fee'],
+          incentiveFee: d['Incentive'],
+          reportedDate: reportDate,
+          commitmentAmountTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'LP Commitment').reduce((acc, curr) => acc + curr.amount, 0),
+          capitalCalledTotal: totalCapitalCalled,
+          capitalDistributedTotal: totalCapitalDistributed,
+          incomeDistributedTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0),
+          remainingCapitalTotal: totalCapitalCalled - totalCapitalDistributed,
+          ledger: mappedLedgerData
       })});
       
     return new NextResponse(JSON.stringify({
       id: lpId,
       name: applicableLp?.['LP Short Name'],
-      status: applicableLp?.['Status'],
+      status: 'Active',
       source: applicableLp?.['Source'],
       firstClose: excelDateToJSDate(Number(applicableLp?.['Effective Date'])),
       inactiveDate: applicableLp?.['Inactive Date'] ? new Date(applicableLp?.['Inactive Date']) : null,

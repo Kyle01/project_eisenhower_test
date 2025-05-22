@@ -15,7 +15,8 @@ export type LimitedPartnerDetail = {
 }
 
 export type LimitedPartnerFundDetail = {
-    firstClose: Date;
+    name: string;
+    firstClose?: Date;
     reinvestmentStart?: Date;
     harvestStart?: Date;
     managementFee: number;
