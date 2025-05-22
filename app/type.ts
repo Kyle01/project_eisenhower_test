@@ -1,3 +1,5 @@
+type JsonObject = { [key: string]: any };
+
 export type LimitedPartnerDetail = {
     id: string;
     name: string;
@@ -7,7 +9,8 @@ export type LimitedPartnerDetail = {
     inactiveDate?: Date;
     reinvestmentEnabled: boolean;
     funds: LimitedPartnerFundDetail[];
-    cashFlows: Cashflow[]
+    cashFlows: PivotCashflowData[]
+    ledger: LedgerDetail[]
     irr: number | string;
 }
 
@@ -23,7 +26,6 @@ export type LimitedPartnerFundDetail = {
     capitalDistributedTotal: number;
     incomeDistributedTotal: number;
     remainingCapitalTotal: number;
-    ledger: LedgerDetail[]
 }
 
 export type Cashflow = {
@@ -44,3 +46,5 @@ export type LedgerDetail = {
     relatedEntity: string,
     relatedFund: string
 }
+
+export type PivotCashflowData = JsonObject

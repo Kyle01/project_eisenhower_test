@@ -41,6 +41,19 @@ export async function GET(
     const cashFlowWorkbook = XLSX.read(cashFlowBuffer, { type: 'array' });
     const cashFlowData: JsonObject = XLSX.utils.sheet_to_json(cashFlowWorkbook.Sheets[cashFlowWorkbook.SheetNames[0]]);
     const applicableCashflowData: JsonObject[] = cashFlowData.filter((d: any) => d['LP Short Name'] === applicableName && excelDateToJSDate(Number(d['PCAP Date'])) <= reportDate);
+    const pivotCashflowData = (applicableCashflowData: JsonObject[]) => {
+      const map = new Map();
+      for (const { date, field, amount } of applicableCashflowData.map((d: any) => ({ date: excelDateToJSDate(Number(d['PCAP Date'])), field: d['Field'], amount: d[' Amount '] }))) {
+        const key = date.toISOString().split('T')[0]
+        if (!map.has(key)) {
+          map.set(key, { key });
+        }
+        map.get(key)[field] = amount;
+      }
+    
+      return Array.from(map.values());
+    }
+    const pivotCashFlowData = pivotCashflowData(applicableCashflowData)
     const mappedApplicableCashflowData: Cashflow[] = applicableCashflowData.map((d: any) => ({
         date: excelDateToJSDate(Number(d['PCAP Date'])),
         description: d['Field'],
@@ -62,6 +75,20 @@ export async function GET(
       irr = xirr(combinedCashflowDataForIrr.map((d) => ({ when: new Date(d.date), amount: (d.amount )})), { guess: 0.75 });
     }
     
+    const lpLedgerData = ledgerData.filter((ledgerField: any) => ledgerField['Related Entity'] === applicableName && excelDateToJSDate(ledgerField['Effective Date']) <= reportDate);
+    const mappedLpLedgerData: LedgerDetail[] = lpLedgerData.map((ledgerField: any) => ({
+        entryDate: excelDateToJSDate(Number(ledgerField['Entry Date'])),
+        activityDate: excelDateToJSDate(Number(ledgerField['Activity Date'])),
+        effectiveDate: excelDateToJSDate(Number(ledgerField['Effective Date'])),
+        activity: ledgerField['Activity'],
+        subActivity: ledgerField['Sub Activity'],
+        amount: ledgerField['Amount'],
+        entityFrom: ledgerField['Entity From'],
+        entityTo: ledgerField['Entity To'],
+        relatedEntity: ledgerField['Related Entity'],
+        relatedFund: ledgerField['Related Fund']
+    }));
+
     const lpFunds: JsonObject[] = applicableLpPostions.map((d: any) => {
     const applicableLedgerData: JsonObject[] = ledgerData.filter((ledgerField: any) => ledgerField['Related Entity'] === applicableName && ledgerField['Related Fund'] === d['Fund'] && excelDateToJSDate(ledgerField['Effective Date']) <= reportDate);
     const mappedLedgerData: LedgerDetail[] = applicableLedgerData.map((ledgerField: any) => ({
@@ -94,17 +121,18 @@ export async function GET(
         ledger: mappedLedgerData
       })});
       
-      return new NextResponse(JSON.stringify({
-        id: lpId,
-        name: applicableLp?.['LP Short Name'],
-        status: applicableLp?.['Status'],
-        source: applicableLp?.['Source'],
-        firstClose: excelDateToJSDate(Number(applicableLp?.['Effective Date'])),
-        inactiveDate: applicableLp?.['Inactive Date'] ? new Date(applicableLp?.['Inactive Date']) : null,
-        reinvestmentEnabled: false,
-        funds: lpFunds,
-        cashFlows: mappedApplicableCashflowData,
-        irr: irr,
+    return new NextResponse(JSON.stringify({
+      id: lpId,
+      name: applicableLp?.['LP Short Name'],
+      status: applicableLp?.['Status'],
+      source: applicableLp?.['Source'],
+      firstClose: excelDateToJSDate(Number(applicableLp?.['Effective Date'])),
+      inactiveDate: applicableLp?.['Inactive Date'] ? new Date(applicableLp?.['Inactive Date']) : null,
+      reinvestmentEnabled: false,
+      funds: lpFunds,
+      cashFlows: pivotCashFlowData,
+      ledger: mappedLpLedgerData,
+      irr: irr,
     }));
   } catch (error) {
     console.error('Error serving file:', error);
