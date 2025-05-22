@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { excelDateToJSDate } from '@/app/utils';
+import { LedgerDetail } from '@/app/type';
 
 type JsonObject = { [key: string]: any };
 
@@ -28,22 +29,46 @@ export async function GET(
     const lpFundWorkbook = XLSX.read(lpFundBuffer, { type: 'array' });
     const lpFundData: JsonObject = XLSX.utils.sheet_to_json(lpFundWorkbook.Sheets[lpFundWorkbook.SheetNames[0]]);
     const applicableLpPostions: JsonObject[] = lpFundData.filter((d: any) => d['LP Short Name'] === applicableName);
+
+    const ledgerFilePath = path.join(process.cwd(), 'public', 'reports', 'tbLedger.csv');
+    const ledgerBuffer = await fs.readFile(ledgerFilePath);
+    const ledgerWorkbook = XLSX.read(ledgerBuffer, { type: 'array' });
+    const ledgerData: JsonObject = XLSX.utils.sheet_to_json(ledgerWorkbook.Sheets[ledgerWorkbook.SheetNames[0]]);
     
-    const lpFunds: JsonObject[] = applicableLpPostions.map((d: any) => ({
-        firstClose: excelDateToJSDate(Number(d['Term End'])),
-        reinvestmentStart: d['Reinvest Start'] !== 'NA' ? excelDateToJSDate(Number(d['Reinvest Start'])) : null,
-        harvestStart: d['Harvest Start'] ? excelDateToJSDate(Number(d['Term End'])) : null,
-        managementFee: d['Management Fee'],
-        incentiveFee: d['Incentive'],
-        reportedDate: reportDate,
-        commitmentAmountTotal: 1,
-        capitalCalledTotal: 1,
-        capitalDistributedTotal: 1,
-        incomeDistributedTotal: 1,
-        remainingCapitalTotal: 1,
-        irr: 1,
-        cashFlows: []
-    }));
+    
+    const lpFunds: JsonObject[] = applicableLpPostions.map((d: any) => {
+        const applicableLedgerData: JsonObject[] = ledgerData.filter((ledgerField: any) => ledgerField['Related Entity'] === applicableName && ledgerField['Related Fund'] === d['Fund'] && excelDateToJSDate(ledgerField['Effective Date']) <= reportDate);
+        const mappedLedgerData: LedgerDetail[] = applicableLedgerData.map((ledgerField: any) => ({
+            entryDate: excelDateToJSDate(Number(ledgerField['Entry Date'])),
+            activityDate: excelDateToJSDate(Number(ledgerField['Activity Date'])),
+            effectiveDate: excelDateToJSDate(Number(ledgerField['Effective Date'])),
+            activity: ledgerField['Activity'],
+            subActivity: ledgerField['Sub Activity'],
+            amount: ledgerField['Amount'],
+            entityFrom: ledgerField['Entity From'],
+            entityTo: ledgerField['Entity To'],
+            relatedEntity: ledgerField['Related Entity'],
+            relatedFund: ledgerField['Related Fund']
+        }));
+        
+        const totalCapitalCalled = mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Capital Call').reduce((acc, curr) => acc + curr.amount, 0)
+        const totalCapitalDistributed =  mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Capital Distribution').reduce((acc, curr) => acc + curr.amount, 0)
+        return ({
+            firstClose: excelDateToJSDate(Number(d['Term End'])),
+            reinvestmentStart: d['Reinvest Start'] !== 'NA' ? excelDateToJSDate(Number(d['Reinvest Start'])) : null,
+            harvestStart: d['Harvest Start'] ? excelDateToJSDate(Number(d['Term End'])) : null,
+            managementFee: d['Management Fee'],
+            incentiveFee: d['Incentive'],
+            reportedDate: reportDate,
+            commitmentAmountTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'LP Commitment').reduce((acc, curr) => acc + curr.amount, 0),
+            capitalCalledTotal: totalCapitalCalled,
+            capitalDistributedTotal: totalCapitalDistributed,
+            incomeDistributedTotal: mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0),
+            remainingCapitalTotal: totalCapitalCalled - totalCapitalDistributed,
+            irr: 1,
+            cashFlows: [],
+            ledger: mappedLedgerData
+    })});
 
     return new NextResponse(JSON.stringify({
         id: lpId,

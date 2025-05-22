@@ -66,6 +66,8 @@ export default function LimitedPartnerPage() {
               onChange={(date) => setSelectedReportDate(date || new Date())}
               maxDate={new Date()}
               className="w-full p-1 max-w-[400px] border border-gray-300 rounded-md text-lg"
+              showMonthDropdown
+              showYearDropdown
             />
           </div>
         </div>
