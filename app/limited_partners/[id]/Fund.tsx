@@ -1,14 +1,15 @@
+import { useRef, useState } from "react";
 import { formatNumberToPercentage, formatNumberToCurrency } from "@/app/utils";
 import { LimitedPartnerFundDetail } from "@/app/type";
-import { useState } from "react";
+import { sharedColumnDefs } from "@/app/style";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faDownload, faFileExcel } from "@fortawesome/free-solid-svg-icons";
 import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry, AllCommunityModule, ColDef } from 'ag-grid-community';
+import { ModuleRegistry, ColDef, AllCommunityModule } from 'ag-grid-community';
 import { themeBalham, colorSchemeDarkBlue } from 'ag-grid-community';
 
 const themeBalhamDark = themeBalham.withPart(colorSchemeDarkBlue);
-    
+      
 ModuleRegistry.registerModules([ AllCommunityModule ])
 
 interface FundProps {
@@ -17,20 +18,21 @@ interface FundProps {
 }
 
 const columnDefs: ColDef[] = [
-    { field: 'entryDate', headerName: 'Entry Date', width: 150 },
-    { field: 'activityDate', headerName: 'Activity Date', width: 150 },
-    { field: 'effectiveDate', headerName: 'Effective Date', width: 150 },
-    { field: 'activity', headerName: 'Activity', width: 150 },
-    { field: 'subActivity', headerName: 'Sub Activity', width: 150 },
-    { field: 'amount', headerName: 'Amount', width: 150 },
-    { field: 'entityFrom', headerName: 'Entity From', width: 150 },
-    { field: 'entityTo', headerName: 'Entity To', width: 150 },
-    { field: 'relatedEntity', headerName: 'Related Entity', width: 150 },
-    { field: 'relatedFund', headerName: 'Related Fund', width: 150 }
+    { ...sharedColumnDefs.date, field: 'entryDate', headerName: 'Entry Date' },
+    { ...sharedColumnDefs.date, field: 'activityDate', headerName: 'Activity Date' },
+    { ...sharedColumnDefs.date, field: 'effectiveDate', headerName: 'Effective Date' },
+    { field: 'activity', headerName: 'Activity', width: 150, filter: true },
+    { field: 'subActivity', headerName: 'Sub Activity', width: 150, filter: true },
+    { ...sharedColumnDefs.money, field: 'amount', headerName: 'Amount' },
+    { field: 'entityFrom', headerName: 'Entity From', width: 125, filter: true },
+    { field: 'entityTo', headerName: 'Entity To', width: 125, filter: true },
+    { field: 'relatedEntity', headerName: 'Related Entity', width: 125, filter: true },
+    { field: 'relatedFund', headerName: 'Related Fund', width: 150, filter: true }
 ]
 
 
 export default function Fund({ fund, index }: FundProps) {
+    const gridRef = useRef(null);
     const [isOpen, setIsOpen] = useState(true);
 
     return (
@@ -119,14 +121,31 @@ export default function Fund({ fund, index }: FundProps) {
                             </table>
                         </div>
                     </div>
-                </div>
-                <p className="px-4">Fund Ledger Transactions:</p>
-                <div className="p-4 h-[500px]">
-                    <AgGridReact
-                        columnDefs={columnDefs}
-                        rowData={fund.ledger}
-                        theme={themeBalhamDark}
-                    />
+                    <div className="col-span-2">
+                        <div className="px-4 flex justify-between items-center">
+                            <p className="text-lg font-medium text-gray-200">Fund Ledger Transactions:</p>
+                            <button className="bg-gray-800 space-x-2 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-md cursor-pointer" onClick={() => {
+                                const grid = gridRef.current as any;
+                                if (grid && grid.api) {
+                                    grid.api.exportDataAsCsv({
+                                        fileName: `${fund.name} - Ledger.csv`,
+                                        includeHiddenColumns: true,
+                                    });
+                                }
+                            }}>
+                                <FontAwesomeIcon icon={faDownload}  />
+                                <FontAwesomeIcon icon={faFileExcel} />
+                            </button>
+                        </div>
+                        <div className="p-4 h-[300px]">
+                            <AgGridReact
+                                ref={gridRef}
+                                columnDefs={columnDefs}
+                                rowData={fund.ledger}
+                                theme={themeBalhamDark}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
