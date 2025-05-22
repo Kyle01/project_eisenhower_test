@@ -81,7 +81,11 @@ export default function LimitedPartnerPage() {
           <DisplayCard label="First Close" value={selectedLpDetails?.firstClose && new Date(selectedLpDetails?.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) || 'N/A'  } />
           <DisplayCard label="Inactive Date" value={selectedLpDetails?.inactiveDate && new Date(selectedLpDetails?.inactiveDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'}) || 'N/A'} />
           <DisplayCard label="Reinvestment Enabled" value={selectedLpDetails?.reinvestmentEnabled ? 'Yes' : 'No'} />
-          <DisplayCard label="IRR" value={selectedLpDetails?.irr && selectedLpDetails?.irr !== 'NA' ? formatNumberToPercentage(Number(selectedLpDetails?.irr)) : 'N/A'} />
+          <DisplayCard 
+            label="IRR" 
+            value={selectedLpDetails?.irr && selectedLpDetails?.irr !== 'NA' ? formatNumberToPercentage(Number(selectedLpDetails?.irr)) : 'N/A'} 
+            information={selectedLpDetails?.irr && selectedLpDetails?.irr === 'NA' ? `IRR cannot be calculated because committed values are missing` : 'IRR is calculated by considering the cashflows and the most recent capital balance and applying the XIRR formula. See Excel for more details. '}
+          />
         </div>
         <p className="text-lg font-bold underline">Client Participating Funds: {selectedLpDetails?.funds.length}</p>
         <div>
