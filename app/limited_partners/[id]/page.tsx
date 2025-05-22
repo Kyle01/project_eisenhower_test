@@ -80,8 +80,8 @@ export default function LimitedPartnerPage() {
           <DisplayCard label="Reinvestment Enabled" value={selectedLpDetails?.reinvestmentEnabled ? 'Yes' : 'No'} />
           <DisplayCard label="IRR" value={selectedLpDetails?.irr && selectedLpDetails?.irr !== 'NA' ? formatNumberToPercentage(Number(selectedLpDetails?.irr)) : 'N/A'} />
         </div>
-        <p className="text-lg font-bold">Client Participating Funds: {selectedLpDetails?.funds.length}</p>
-        <div className="border-y border-gray-300 divide-y divide-gray-300">
+        <p className="text-lg font-bold underline">Client Participating Funds: {selectedLpDetails?.funds.length}</p>
+        <div className="">
           {selectedLpDetails?.funds.map((fund, index) => <Fund fund={fund} key={index} index={index} />)}
         </div>
       </div>
