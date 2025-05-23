@@ -34,3 +34,14 @@ body {
   --color-excelGreen: #1D6F42;
   --color-excelGreen-hover: #185A36;
 }
+
+/* Select and Option styling */
+select {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+select option {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
