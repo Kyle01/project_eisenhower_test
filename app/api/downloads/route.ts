@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     const applicableCashflows = limitedPartnerData.ledger.filter((ledger: any) => ledger.activity === 'Capital Call' || ledger.activity === 'LP Distribution')
     const finalCapitalBalance = {amount: limitedPartnerData.cashFlows.at(-1)['Ending Capital Balance'], when: limitedPartnerData.cashFlows.at(-1).key}
     const irrData = [
-      ['Calculated IRR', '=XIRR(C4:C100, A2:A100)'],
+      ['Calculated IRR', { f: 'XIRR(C4:C100, A4:A100)', t: 'n' }],
       ['', ''],
       ['Applied Cashflows', ''],
       ...applicableCashflows.map((cashflow: any) => [jsDateToExcelDate(new Date(cashflow.activityDate)), cashflow.activity, cashflow.activity === 'Capital Call' ? cashflow.amount * -1 : cashflow.amount]),

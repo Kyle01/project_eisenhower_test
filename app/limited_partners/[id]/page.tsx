@@ -16,8 +16,6 @@ interface LimitedPartner {
   name: string;
 }
 
-type JsonObject = { [key: string]: any };
-
 export default function LimitedPartnerPage() {
   const router = useRouter();
   const params = useParams<{id: string}>();
@@ -111,7 +109,7 @@ export default function LimitedPartnerPage() {
         <div className='grid grid-cols-6 gap-4'>
           <DisplayCard label="Status" value={selectedLpDetails?.status} />
           <DisplayCard label="Source" value={selectedLpDetails?.source} />
-          <DisplayCard label="First Close" value={selectedLpDetails?.firstClose && new Date(selectedLpDetails?.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) || 'N/A'  } />
+          <DisplayCard label="Effective Date" value={selectedLpDetails?.firstClose && new Date(selectedLpDetails?.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) || 'N/A'  } />
           <DisplayCard label="Inactive Date" value={selectedLpDetails?.inactiveDate && new Date(selectedLpDetails?.inactiveDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'}) || 'N/A'} />
           <DisplayCard label="Reinvestment Enabled" value={selectedLpDetails?.reinvestmentEnabled ? 'Yes' : 'No'} />
           <DisplayCard 

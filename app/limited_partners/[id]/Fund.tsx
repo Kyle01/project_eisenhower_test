@@ -59,7 +59,7 @@ export default function Fund({ fund, index }: FundProps) {
                                 </thead>
                                 <tbody>
                                     <tr className="bg-gray-900 hover:bg-gray-800">
-                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">First Close</td>
+                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">Term End</td>
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{fund.firstClose ? new Date(fund.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) : '-'}</td>
                                     </tr>
                                     <tr className="bg-gray-950 hover:bg-gray-800">
