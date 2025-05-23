@@ -118,9 +118,9 @@ export default function LimitedPartnerPage() {
             information={selectedLpDetails?.irr && selectedLpDetails?.irr === 'NA' ? `IRR cannot be calculated because committed values are missing` : 'IRR is calculated by considering the cashflows and the most recent capital balance and applying the XIRR formula. See Excel download for more details. '}
           />
         </div>
-        <p className="text-lg font-bold underline">Client Participating Funds: {selectedLpDetails?.funds.length}</p>
+        <p className="text-lg font-bold underline">Client Participating Funds: {selectedLpDetails?.funds?.length}</p>
         <div>
-          {selectedLpDetails?.funds.map((fund, index) => <Fund fund={fund} key={index} index={index} />)}
+          {selectedLpDetails?.funds?.map((fund, index) => <Fund fund={fund} key={index} index={index} />)}
         </div>
         <CashflowTable cashFlows={selectedLpDetails?.cashFlows || []} name={name ?? ''} />
       </div>
