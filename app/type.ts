@@ -27,6 +27,7 @@ export type LimitedPartnerFundDetail = {
     capitalDistributedTotal: number;
     incomeDistributedTotal: number;
     remainingCapitalTotal: number;
+    totalDistributed: number;
     ledger: LedgerDetail[]
 }
 

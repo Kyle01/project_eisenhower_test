@@ -111,18 +111,26 @@ export default function LimitedPartnerPage() {
           <DisplayCard label="Source" value={selectedLpDetails?.source} />
           <DisplayCard label="Effective Date" value={selectedLpDetails?.firstClose && new Date(selectedLpDetails?.firstClose).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC'}) || 'N/A'  } />
           <DisplayCard label="Inactive Date" value={selectedLpDetails?.inactiveDate && new Date(selectedLpDetails?.inactiveDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC'}) || 'N/A'} />
-          <DisplayCard label="Reinvestment Enabled" value={selectedLpDetails?.reinvestmentEnabled ? 'Yes' : 'No'} />
+          <DisplayCard label="Number of Funds" value={selectedLpDetails?.funds?.length} />
           <DisplayCard 
             label="IRR" 
             value={selectedLpDetails?.irr && selectedLpDetails?.irr !== 'NA' ? formatNumberToPercentage(Number(selectedLpDetails?.irr)) : 'N/A'} 
             information={selectedLpDetails?.irr && selectedLpDetails?.irr === 'NA' ? `IRR cannot be calculated because committed values are missing` : 'IRR is calculated by considering the cashflows and their effective dates and the most recent capital balance and applying the XIRR formula. See Excel download for more details.'}
           />
-          <DisplayCard label="Number of Funds" value={selectedLpDetails?.funds?.length} />
           <DisplayCard label="Commitment Amount" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.commitmentAmountTotal).reduce((acc, a) => acc + a, 0))} />
           <DisplayCard label="Capital Called" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.capitalCalledTotal).reduce((acc, a) => acc + a, 0))} />
           <DisplayCard label="Capital Distributed" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.capitalDistributedTotal).reduce((acc, a) => acc + a, 0))} />
-          <DisplayCard label="Remaining Capital" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.remainingCapitalTotal).reduce((acc, a) => acc + a, 0))} />
+          <DisplayCard 
+            label="Remaining Capital" 
+            value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.remainingCapitalTotal).reduce((acc, a) => acc + a, 0))} 
+            information={`Remaining Capital is the difference between the Capital Called and the Capital Distributed.`}
+          />
           <DisplayCard label="Income Distributed" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.incomeDistributedTotal).reduce((acc, a) => acc + a, 0))} />
+          <DisplayCard 
+            label="Total Distributed" 
+            value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.totalDistributed).reduce((acc, a) => acc + a, 0))} 
+            information={`Total Distributed is the sum of the Capital Distributed and the Income Distributed.`}
+          />
         </div>
         <div>
           {selectedLpDetails?.funds?.map((fund, index) => <Fund fund={fund} key={index} index={index} />)}

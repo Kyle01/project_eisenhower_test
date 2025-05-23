@@ -107,6 +107,8 @@ export async function GET(
     
       const totalCapitalCalled = mappedLedgerData.filter((d: LedgerDetail) => d.activity === 'Capital Call').reduce((acc, curr) => acc + curr.amount, 0)
       const totalCapitalDistributed =  mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Capital Distribution').reduce((acc, curr) => acc + curr.amount, 0)
+      const totalIncomeDistributed = mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0)
+      const totalDistributed = totalCapitalDistributed + totalIncomeDistributed
       return ({
           name: d['Fund'],
           firstClose: excelDateToJSDate(Number(d['Term End'])),
@@ -119,6 +121,7 @@ export async function GET(
           capitalCalledTotal: totalCapitalCalled,
           capitalDistributedTotal: totalCapitalDistributed,
           incomeDistributedTotal: mappedLedgerData.filter((d: LedgerDetail) => d.subActivity === 'Income Distribution').reduce((acc, curr) => acc + curr.amount, 0),
+          totalDistributed: totalDistributed,
           remainingCapitalTotal: totalCapitalCalled - totalCapitalDistributed,
           ledger: mappedLedgerData
       })});
