@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { jsDateToExcelDate } from '@/app/utils';
 import * as XLSX from 'xlsx';
 
 export async function POST(request: Request) {
@@ -16,9 +17,16 @@ export async function POST(request: Request) {
 
     const workbook = XLSX.utils.book_new();
     
-    const worksheet = XLSX.utils.aoa_to_sheet([
-      ['Limited Partner', limitedPartnerData.name]
-    ]);
+    const summaryData = Object.entries(limitedPartnerData)
+      .filter(([_, value]) => 
+        value !== null && 
+        typeof value !== 'object' && 
+        !Array.isArray(value)
+      )
+      .map(([key, value]) => [key, value]);
+
+    const summaryWorksheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'summary');
 
     const cashflowsWorksheet = XLSX.utils.json_to_sheet(limitedPartnerData.cashFlows || []);
     const ledgerWorksheet = XLSX.utils.json_to_sheet(limitedPartnerData.ledger || []);
@@ -43,9 +51,29 @@ export async function POST(request: Request) {
       });
     }
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'summary');
     XLSX.utils.book_append_sheet(workbook, cashflowsWorksheet, 'cashflows');
     XLSX.utils.book_append_sheet(workbook, ledgerWorksheet, 'lp_ledger');
+
+    const applicableCashflows = limitedPartnerData.ledger.filter((ledger: any) => ledger.activity === 'Capital Call' || ledger.activity === 'LP Distribution')
+    const finalCapitalBalance = {amount: limitedPartnerData.cashFlows.at(-1)['Ending Capital Balance'], when: limitedPartnerData.cashFlows.at(-1).key}
+    const irrData = [
+      ['Calculated IRR', '=XIRR(C4:C100, A2:A100)'],
+      ['', ''],
+      ['Applied Cashflows', ''],
+      ...applicableCashflows.map((cashflow: any) => [jsDateToExcelDate(new Date(cashflow.activityDate)), cashflow.activity, cashflow.activity === 'Capital Call' ? cashflow.amount * -1 : cashflow.amount]),
+      [jsDateToExcelDate(new Date(finalCapitalBalance.when)), 'Final Capital Balance', finalCapitalBalance.amount]
+    ];
+    const irrWorksheet = XLSX.utils.aoa_to_sheet(irrData);
+    
+    const range = XLSX.utils.decode_range(irrWorksheet['!ref'] || 'A1');
+    for (let R = 3; R <= range.e.r; R++) {
+      const cellRef = XLSX.utils.encode_cell({ r: R, c: 0 });
+      if (!irrWorksheet[cellRef]) continue;
+      
+      irrWorksheet[cellRef].z = 'mm/dd/yyyy';
+    }
+    
+    XLSX.utils.book_append_sheet(workbook, irrWorksheet, 'irr_calculation');
 
     const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 

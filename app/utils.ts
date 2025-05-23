@@ -3,6 +3,14 @@ export const excelDateToJSDate = (excelDate: number): Date => {
     return new Date(Math.round((excelDate - 25569) * 86400 * 1000));
 }
 
+export const jsDateToExcelDate = (date: Date) => {
+    const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // Dec 30, 1899
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const diffInDays = (date.getTime() - excelEpoch.getTime()) / msPerDay;
+
+    return diffInDays;
+  }
+
 export const formatNumberToPercentage = (number: number): string => {
     return (number * 100).toFixed(2) + '%';
 }
