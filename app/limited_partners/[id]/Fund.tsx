@@ -104,13 +104,13 @@ export default function Fund({ fund, index }: FundProps) {
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">Capital Distributed Total</td>
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{formatNumberToCurrency(fund.capitalDistributedTotal)}</td>
                                     </tr>
-                                    <tr className="bg-gray-900 hover:bg-gray-800">
-                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">Income Distributed Total</td>
-                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{formatNumberToCurrency(fund.incomeDistributedTotal)}</td>
-                                    </tr>
                                     <tr className="bg-gray-950 hover:bg-gray-800">
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">Remaining Capital Total</td>
                                         <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{formatNumberToCurrency(fund.remainingCapitalTotal)}</td>
+                                    </tr>
+                                    <tr className="bg-gray-900 hover:bg-gray-800">
+                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800">Income Distributed Total</td>
+                                        <td className="px-3 py-1.5 text-xs text-gray-300 border-b border-gray-800 text-right">{formatNumberToCurrency(fund.incomeDistributedTotal)}</td>
                                     </tr>
                                 </tbody>
                             </table>
