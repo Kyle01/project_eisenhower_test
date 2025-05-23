@@ -10,6 +10,7 @@ import { formatNumberToPercentage } from '@/app/utils';
 import "react-datepicker/dist/react-datepicker.css";
 import Fund from './Fund';
 import CashflowTable from './CashflowTable';
+import Button from '@/app/components/Button';
 
 interface LimitedPartner {
   id: string;
@@ -51,30 +52,44 @@ export default function LimitedPartnerPage() {
     setSelectedLp(newId);
   };
 
+  const initiateDownload = () => {
+    console.log('download report');
+  }
+
   const name = selectedLpDetails?.name;
 
   return (
     <div className="my-8">
       <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4 max-w-[500px] items-center">
-          <p className="text-lg font-bold">Selected a Limited Partner:</p>
-          <select value={selectedLp} onChange={handleLpChange} className="w-full p-2 max-w-[400px] border border-gray-300 rounded-md text-lg">
-            {availableLps?.map((lp) => (
-              <option key={lp.id} value={lp.id}>{lp.name}</option>
-            ))}
-          </select>
-        </div>
-          <div className="grid grid-cols-2 gap-4 max-w-[500px] items-center">
-            <p className="text-lg font-bold">Applied Report Date:</p>
-            <DatePicker
-              selected={selectedReportDate}
-              onChange={(date) => setSelectedReportDate(date || new Date())}
-              maxDate={new Date()}
-              className="w-full p-1 max-w-[400px] border border-gray-300 rounded-md text-lg"
-              showMonthDropdown
-              showYearDropdown
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='space-y-4'>
+            <div className="grid grid-cols-2 gap-4 max-w-[500px] items-center">
+              <p className="text-lg font-bold">Selected a Limited Partner:</p>
+              <select value={selectedLp} onChange={handleLpChange} className="w-full p-2 max-w-[400px] border border-gray-300 rounded-md text-lg">
+                {availableLps?.map((lp) => (
+                  <option key={lp.id} value={lp.id}>{lp.name}</option>
+                ))}
+              </select>
+            </div>
+              <div className="grid grid-cols-2 gap-4 max-w-[500px] items-center">
+                <p className="text-lg font-bold">Applied Report Date:</p>
+                <DatePicker
+                  selected={selectedReportDate}
+                  onChange={(date) => setSelectedReportDate(date || new Date())}
+                  maxDate={new Date()}
+                  className="w-full p-1 max-w-[400px] border border-gray-300 rounded-md text-lg"
+                  showMonthDropdown
+                  showYearDropdown
+                />
+              </div>
+          </div>
+          <div className='flex justify-center items-center'>
+            <Button 
+              label="Download Detailed Excel Report"
+              onClick={initiateDownload}
             />
           </div>
+        </div>
         <div className='grid grid-cols-6 gap-4'>
           <DisplayCard label="Status" value={selectedLpDetails?.status} />
           <DisplayCard label="Source" value={selectedLpDetails?.source} />
