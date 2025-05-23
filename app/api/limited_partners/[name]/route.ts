@@ -76,12 +76,10 @@ export async function GET(
       return ({when: new Date(d.effectiveDate), amount: appliedAmount})
     })
     const lastBalance = pivotCashFlowData.at(-1)
-    console.log(lastBalance)
     const cashflowDataWithLastBalance = [
       ...mappedLedgerCfData,
       {when: new Date(lastBalance['key']), amount: lastBalance['Ending Capital Balance']}
     ]
-    console.log(cashflowDataWithLastBalance)
     try {
       irr = xirr(cashflowDataWithLastBalance, { guess: 0.25 })
     } catch (error) {

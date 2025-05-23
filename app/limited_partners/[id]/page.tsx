@@ -67,8 +67,6 @@ export default function LimitedPartnerPage() {
     });
   }
 
-  console.log(selectedLpDetails)
-
   const name = selectedLpDetails?.name;
 
   return (
