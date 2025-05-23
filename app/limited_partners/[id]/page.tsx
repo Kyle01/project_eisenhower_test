@@ -9,8 +9,7 @@ import DisplayCard from '@/app/components/DisplayCard';
 import { formatNumberToPercentage } from '@/app/utils';
 import "react-datepicker/dist/react-datepicker.css";
 import Fund from './Fund';
-import CashflowTable from './CashflowTable';
-import Button from '@/app/components/Button';
+import CashflowTable from './CashflowTable';  
 
 interface LimitedPartner {
   id: string;
@@ -44,8 +43,6 @@ export default function LimitedPartnerPage() {
       });
   }, [params.id, selectedReportDate]);
 
-  console.log(selectedLpDetails)
-
   const handleLpChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newId = e.target.value;
     router.push(`/limited_partners/${newId}`);
@@ -53,8 +50,26 @@ export default function LimitedPartnerPage() {
   };
 
   const initiateDownload = () => {
-    console.log('download report');
+    fetch('/api/downloads', {
+      method: 'POST',
+      body: JSON.stringify({
+        limitedPartnerData: selectedLpDetails
+      })
+    })
+    .then(res => res.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${selectedLpDetails?.name || 'limited_partner'}_report.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    });
   }
+
+  console.log(selectedLpDetails)
 
   const name = selectedLpDetails?.name;
 
@@ -84,10 +99,13 @@ export default function LimitedPartnerPage() {
               </div>
           </div>
           <div className='flex justify-center items-center'>
-            <Button 
-              label="Download Detailed Excel Report"
+            <button 
               onClick={initiateDownload}
-            />
+              disabled={!selectedLpDetails}
+              className="bg-excelGreen text-white px-4 py-2 rounded-md hover:bg-excelGreen-hover cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400"
+            >
+              Download Detailed Excel Report
+            </button>
           </div>
         </div>
         <div className='grid grid-cols-6 gap-4'>
@@ -99,7 +117,7 @@ export default function LimitedPartnerPage() {
           <DisplayCard 
             label="IRR" 
             value={selectedLpDetails?.irr && selectedLpDetails?.irr !== 'NA' ? formatNumberToPercentage(Number(selectedLpDetails?.irr)) : 'N/A'} 
-            information={selectedLpDetails?.irr && selectedLpDetails?.irr === 'NA' ? `IRR cannot be calculated because committed values are missing` : 'IRR is calculated by considering the cashflows and the most recent capital balance and applying the XIRR formula. See Excel for more details. '}
+            information={selectedLpDetails?.irr && selectedLpDetails?.irr === 'NA' ? `IRR cannot be calculated because committed values are missing` : 'IRR is calculated by considering the cashflows and the most recent capital balance and applying the XIRR formula. See Excel download for more details. '}
           />
         </div>
         <p className="text-lg font-bold underline">Client Participating Funds: {selectedLpDetails?.funds.length}</p>

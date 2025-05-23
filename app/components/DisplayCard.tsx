@@ -13,10 +13,10 @@ export default function DisplayCard({ label, value, information }: DisplayCardPr
     return (
         <div className="flex flex-col bg-gray-900 justify-center items-center p-4 rounded-sm border border-gray-300">
             <div className="w-full">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                     <p className="text-shamrock-200 text-left text-sm">{label}</p>
                     {information && (
-                        <div className="group relative pb-2">
+                        <div className="group relative pb-1">
                             <FontAwesomeIcon 
                                 icon={faCircleInfo} 
                                 className="text-shamrock-200/50 text-xs hover:text-shamrock-200 transition-colors"
