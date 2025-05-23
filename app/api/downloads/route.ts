@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       ['Calculated IRR', { f: 'XIRR(C4:C100, A4:A100)', t: 'n' }],
       ['', ''],
       ['Applied Cashflows', ''],
-      ...applicableCashflows.map((cashflow: any) => [jsDateToExcelDate(new Date(cashflow.activityDate)), cashflow.activity, cashflow.activity === 'Capital Call' ? cashflow.amount * -1 : cashflow.amount]),
+      ...applicableCashflows.map((cashflow: any) => [jsDateToExcelDate(new Date(cashflow.effectiveDate)), cashflow.activity, cashflow.activity === 'Capital Call' ? cashflow.amount * -1 : cashflow.amount]),
       [jsDateToExcelDate(new Date(finalCapitalBalance.when)), 'Final Capital Balance', finalCapitalBalance.amount]
     ];
     const irrWorksheet = XLSX.utils.aoa_to_sheet(irrData);

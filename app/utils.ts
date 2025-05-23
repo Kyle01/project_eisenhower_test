@@ -18,3 +18,7 @@ export const formatNumberToPercentage = (number: number): string => {
 export const formatNumberToCurrency = (number: number, decimals: number = 2): string => {
     return number.toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: decimals, maximumFractionDigits: decimals});
 }
+export const formatNumberToCurrencyMillions = (number?: number, decimals: number = 1): string => {
+    if (!number) return '-';
+    return `${(number / 1000000).toLocaleString('en-US', {style: 'currency', currency: 'USD', minimumFractionDigits: decimals, maximumFractionDigits: decimals})}M`;
+}

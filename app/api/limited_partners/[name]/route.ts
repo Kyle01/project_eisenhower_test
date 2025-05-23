@@ -73,7 +73,7 @@ export async function GET(
   
     const mappedLedgerCfData = mappedLpLedgerData.filter((d) => d.activity !== 'LP Commitment').map((d) => {
       const appliedAmount = d.activity.includes('Capital Call') ? d.amount * -1 : d.amount
-      return ({when: new Date(d.activityDate), amount: appliedAmount})
+      return ({when: new Date(d.effectiveDate), amount: appliedAmount})
     })
     const lastBalance = pivotCashFlowData.at(-1)
     console.log(lastBalance)

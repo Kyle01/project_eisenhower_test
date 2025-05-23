@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import DatePicker from 'react-datepicker';
 import { LimitedPartnerDetail } from '@/app/type';
 import DisplayCard from '@/app/components/DisplayCard';
-import { formatNumberToPercentage } from '@/app/utils';
+import { formatNumberToPercentage, formatNumberToCurrencyMillions } from '@/app/utils';
 import "react-datepicker/dist/react-datepicker.css";
 import Fund from './Fund';
 import CashflowTable from './CashflowTable';  
@@ -115,10 +115,15 @@ export default function LimitedPartnerPage() {
           <DisplayCard 
             label="IRR" 
             value={selectedLpDetails?.irr && selectedLpDetails?.irr !== 'NA' ? formatNumberToPercentage(Number(selectedLpDetails?.irr)) : 'N/A'} 
-            information={selectedLpDetails?.irr && selectedLpDetails?.irr === 'NA' ? `IRR cannot be calculated because committed values are missing` : 'IRR is calculated by considering the cashflows and the most recent capital balance and applying the XIRR formula. See Excel download for more details. '}
+            information={selectedLpDetails?.irr && selectedLpDetails?.irr === 'NA' ? `IRR cannot be calculated because committed values are missing` : 'IRR is calculated by considering the cashflows and their effective dates and the most recent capital balance and applying the XIRR formula. See Excel download for more details.'}
           />
+          <DisplayCard label="Number of Funds" value={selectedLpDetails?.funds?.length} />
+          <DisplayCard label="Commitment Amount" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.commitmentAmountTotal).reduce((acc, a) => acc + a, 0))} />
+          <DisplayCard label="Capital Called" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.capitalCalledTotal).reduce((acc, a) => acc + a, 0))} />
+          <DisplayCard label="Capital Distributed" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.capitalDistributedTotal).reduce((acc, a) => acc + a, 0))} />
+          <DisplayCard label="Remaining Capital" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.remainingCapitalTotal).reduce((acc, a) => acc + a, 0))} />
+          <DisplayCard label="Income Distributed" value={formatNumberToCurrencyMillions(selectedLpDetails?.funds?.map((f) => f.incomeDistributedTotal).reduce((acc, a) => acc + a, 0))} />
         </div>
-        <p className="text-lg font-bold underline">Client Participating Funds: {selectedLpDetails?.funds?.length}</p>
         <div>
           {selectedLpDetails?.funds?.map((fund, index) => <Fund fund={fund} key={index} index={index} />)}
         </div>
